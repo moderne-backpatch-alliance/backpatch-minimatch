@@ -693,6 +693,12 @@ export class Minimatch {
   firstPhasePreProcess(globParts: string[][]) {
     // each **/.. split doubles the patterns, so stop at the brace max
     const { braceExpandMax = 100_000 } = this.options
+    // each split adds one whole pattern's worth of parts, so the total
+    // parse work amplifies with pattern length. Bound the parts the
+    // split pass may add, independently of the pattern count, or a
+    // short pattern with many **/.. occurrences exhausts memory.
+    let splitCells = 0
+    const maxSplitCells = 1_000_000
     let didSomething = false
     do {
       didSomething = false
@@ -722,7 +728,8 @@ export class Minimatch {
             !p2 ||
             p2 === '.' ||
             p2 === '..' ||
-            globParts.length >= braceExpandMax
+            globParts.length >= braceExpandMax ||
+            splitCells >= maxSplitCells
           ) {
             continue
           }
@@ -731,6 +738,7 @@ export class Minimatch {
           parts.splice(gs, 1)
           const other = parts.slice(0)
           other[gs] = '**'
+          splitCells += other.length
           globParts.push(other)
           gs--
         }
