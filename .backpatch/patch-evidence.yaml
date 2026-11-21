@@ -1,0 +1,21 @@
+schema: osera-patch-evidence/0.1.0
+producer: moderne
+release: 10.2.7-backpatch-00001
+baseline: v10.2.6+backpatch.baseline
+fixes:
+  - cve: CVE-2026-118764
+    upstream_fix_url: https://github.com/isaacs/minimatch/commit/77a0f5c4b80bdc641c3c930a1d9edf5ad2db57f8
+    advisory_url: https://nvd.nist.gov/vuln/detail/CVE-2026-118764
+    patch_commit_url: https://github.com/moderne-backpatch-alliance/backpatch-minimatch/compare/c679b04~1...253f2c3
+    basis: backport
+    artifacts:
+      - minimatch
+    note: "New in this release; upstream's fix in 11.0.1 (77a0f5c, 73f0e1b, 9c6ebb1, 2d5578b). It closes the advisory: minimatch has potential denial of service via globparts amplification."
+tests:
+  commit: 253f2c3d0873cdcf438cc32951978019a11d5bc3
+  command: tshy, npm pack --ignore-scripts, then tap in the tested tree, one JUnit test per command from its exit status
+  runtime: Node.js v22.16.0, macOS 27.2 arm64
+  report: minimatch-10.2.7-backpatch-00001-tests.zip
+  report_sha256: 52278200fc015e72e027d6d204b62eb31f8cd221d8dcdd3b76816c250ef8014c
+  result: pass
+  note: "upstream's tap suite upstream's tests on the tested tree with the packed files laid over at the tested commit: 1 tests, 1 passed, 0 failed, 0 skipped. The CVE tests (test/preprocess-limits.ts test/preprocess-cells-limit.ts), with this release's production lines reverted at the tested commit: 1 tests, 0 passed, 1 failed, 0 skipped; with them: 1 tests, 1 passed, 0 failed, 0 skipped. Built with tshy (dist/ from src/), npm pack --ignore-scripts in a directory named minimatch, 43 of npmjs's 53 files for 10.2.6 are identical; the rest are README.md, dist/commonjs/index.d.ts, dist/commonjs/index.d.ts.map, dist/commonjs/index.js, dist/commonjs/index.js.map, dist/esm/index.d.ts, dist/esm/index.d.ts.map, dist/esm/index.js, dist/esm/index.js.map, package.json. The archive's file-origins.yaml maps each packaged file to the commit, or names its inputs and build."
